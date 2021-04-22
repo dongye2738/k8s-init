@@ -1,0 +1,16 @@
+# Jenkins 存储
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: maven
+  namespace: public-service
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+

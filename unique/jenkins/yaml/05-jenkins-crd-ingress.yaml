@@ -1,0 +1,38 @@
+# http-jenkins
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jenkins
+  namespace: public-service
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`jenkins.dongye.com`)
+    kind: Rule
+    services:
+    - name: jenkins
+      port: 8080
+    middlewares:  # 使用上面新建的中间件
+    - name: auto-https
+
+
+# https-jenkins
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: jenkins-tls
+  namespace: public-service
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`jenkins.dongye.com`)
+    kind: Rule
+    services:
+    - name: jenkins
+      port: 8080
+  tls:
+    secretName: dongye-tls   # 注意namespaces

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  creationTimestamp: "2021-02-02T07:55:04Z"
+  name: default
+  namespace: public-service
+  selfLink: /api/v1/namespaces/public-service/serviceaccounts/default
+  uid: 411268ec-972c-4628-9571-e758da7e04a2
+secrets:
+- name: default-token-wh4zr
+imagePullSecrets:
+- name: my-aliyun

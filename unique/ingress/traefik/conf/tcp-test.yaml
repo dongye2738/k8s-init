@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: nginx-proxy
+  namespace: public-service
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: HostSNI(`docker.dongye.com`)
+    services:
+    - name: docker-proxy
+      port: 80
+  tls:
+    secretName: dongye-tls
+

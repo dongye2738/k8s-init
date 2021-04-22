@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: kube-system
+  labels:
+    k8s-app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: prometheus
+  template:
+    metadata:
+      labels:
+        k8s-app: prometheus
+    spec:
+      serviceAccountName: prometheus
+      containers:
+      - name: prometheus  # Prometheus 容器是主容器，用于运行 Prometheus 进程
+        image: prom/prometheus:v2.26.0
+        ports:
+        - name: web
+          containerPort: 9090
+        securityContext:
+          runAsUser: 65534
+          privileged: true
+        command:
+        - "/bin/prometheus"
+        args:
+        - "--config.file=/etc/prometheus/prometheus.yml"  # 指定 Prometheus 配置文件所在地址，这个地址是相对于容器内部而言的
+        - "--web.enable-lifecycle"  #  启用 Prometheus 用于重新加载配置的 /-/reload 接口
+        - "--storage.tsdb.path=/prometheus" # 指定 Prometheus 数据存储目录地址，这个地址是相对于容器而言的。
+        - "--storage.tsdb.retention.time=15d" # 指定删除旧数据的时间。默认为 15d
+        - "--web.console.libraries=/etc/prometheus/console_libraries" # 指定控制台组件依赖的存储路径
+        - "--web.console.templates=/etc/prometheus/consoles"  # 指定控制台模板的存储路径
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1024Mi
+          requests:
+            cpu: 1000m
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 5
+          timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        volumeMounts:
+        - name: data
+          mountPath: /prometheus
+          subPath: prometheus
+        - name: config
+          mountPath: /etc/prometheus
+      - name: configmap-reload  # 用于监听指定的 ConfigMap 文件中的内容，如果内容发生更改，则执行 webhook url 请求
+        image: jimmidyson/configmap-reload:v0.5.0
+        args:
+        - "--volume-dir=/etc/config"
+        - "--webhook-url=http://localhost:9090/-/reload"
+        resources:
+          limits:
+            cpu: 10m
+            memory: 10Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus-nfs
+      - name: config
+        configMap:
+          name: prometheus-config

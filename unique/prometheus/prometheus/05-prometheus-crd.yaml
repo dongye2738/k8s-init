@@ -1,0 +1,39 @@
+# http-prometheus
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus
+  namespace: kube-system
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`prometheus.dongye.com`)
+    kind: Rule
+    services:
+    - name: prometheus
+      port: 9090
+    middlewares:
+    - name: auto-https
+
+
+# https-prometheus
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: prometheus-tls
+  namespace: kube-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`prometheus.dongye.com`)
+    kind: Rule
+    services:
+    - name: prometheus
+      port: 9090
+  tls:
+    secretName: dongye-tls   # 注意namespaces
+

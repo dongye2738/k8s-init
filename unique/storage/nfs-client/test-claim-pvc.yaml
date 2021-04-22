@@ -1,0 +1,15 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim
+  namespace: kube-system
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage" #---需要与上面创建的storageclass的名称一致
+spec:
+  accessModes:
+    - ReadWriteMany     #---该卷可以被许多节点读写安装
+    #- ReadWriteOnce    #---可以通过单个节点以读写方式安装该卷
+    #- ReadOnlyMany     #---该卷可以被许多节点只读安装
+  resources:
+    requests:
+      storage: 1Mi

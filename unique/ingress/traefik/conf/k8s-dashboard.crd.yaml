@@ -1,0 +1,50 @@
+# 自动跳转中间件 注意namespaces
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: auto-https
+  namespace: kube-system
+spec:
+  redirectScheme:
+    scheme: https
+
+
+# http-k8s-dashboard
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: k8s-dashboard
+  namespace: kube-system
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`dashboard.dongye.com`)
+    kind: Rule
+    services:
+    - name: kubernetes-dashboard
+      port: 80
+    middlewares:  # 使用上面新建的中间件
+    - name: auto-https
+
+
+# https-k8s-dashboard
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: k8s-dashboard-tls
+  namespace: kube-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`dashboard.dongye.com`)
+    kind: Rule
+    services:
+    - name: kubernetes-dashboard
+      port: 443
+  tls:
+    secretName: dongye-tls   # 注意namespaces

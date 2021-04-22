@@ -1,0 +1,3 @@
+kubectl create secret docker-registry my-aliyun --docker-server=registry.cn-hangzhou.aliyuncs.com --docker-username=miosy1996@gmail.com --docker-password=xxx -n public-service
+
+

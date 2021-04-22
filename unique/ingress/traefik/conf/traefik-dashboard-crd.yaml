@@ -1,0 +1,20 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard-route
+  namespace: kube-system
+spec:
+  entryPoints:
+  - web
+#  tls:
+#    secretName: dongye-tls  # 需将证书放到k8s secret中
+  routes:
+#  - match: Host(`traefik.dongye.com`) && PathPrefix(`/api`)
+  - match: Host(`traefik.dongye.com`)
+    kind: Rule
+    services:
+      - name: traefik
+        port: 8080
+#    middlewares:  # 调用中间件开启强制跳转到 HTTPS
+#    - name: redirect-https

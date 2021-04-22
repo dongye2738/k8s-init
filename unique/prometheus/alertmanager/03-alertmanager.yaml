@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: kube-system
+  labels:
+    k8s-app: alertmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: alertmanager
+  template:
+    metadata:
+      labels:
+        k8s-app: alertmanager
+    spec:
+      containers:
+      - name: alertmanager  # alertmanager 容器是主容器，用于运行 alertmanager 进程
+        image: prom/alertmanager:v0.21.0
+        ports:
+        - name: web
+          containerPort: 9093
+#        securityContext:
+#          runAsUser: 65534
+#          privileged: true
+        command:
+        - "/bin/alertmanager"
+        args:
+        - "--config.file=/etc/alertmanager/alertmanager.yml"  # 指定 alertmanager 配置文件所在地址，这个地址是相对于容器内部而言的
+        - "--storage.path=/alertmanager" # 指定 alertmanager 数据存储目录地址，这个地址是相对于容器而言的。
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 5
+          timeoutSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        volumeMounts:
+#        - name: data
+#          mountPath: /alertmanager
+#          subPath: alertmanager
+        - name: config
+          mountPath: /etc/alertmanager
+      - name: configmap-reload  # 用于监听指定的 ConfigMap 文件中的内容，如果内容发生更改，则执行 webhook url 请求
+        image: jimmidyson/configmap-reload:v0.5.0
+        args:
+        - "--volume-dir=/etc/config"
+        - "--webhook-url=http://localhost:9093/-/reload"
+        resources:
+          limits:
+            cpu: 10m
+            memory: 10Mi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+      volumes:
+#      - name: data
+#        persistentVolumeClaim:
+#          claimName: alertmanager-nfs
+      - name: config
+        configMap:
+          name: alertmanager-config

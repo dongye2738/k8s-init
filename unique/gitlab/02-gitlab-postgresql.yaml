@@ -1,0 +1,85 @@
+# gitlab-postgresql-service
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: gitlab-postgresql
+  namespace: public-service
+  labels:
+    name: gitlab-postgresql
+spec:
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: postgres
+  selector:
+    name: gitlab-postgresql
+  type: ClusterIP
+
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: gitlab-postgresql
+  namespace: public-service
+  labels:
+    name: gitlab-postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: gitlab-postgresql
+  template:
+    metadata:
+      name: gitlab-postgresql
+      labels:
+        name: gitlab-postgresql
+    spec:
+      containers:
+      - name: gitlab-postgresql
+        image: registry.cn-hangzhou.aliyuncs.com/dongye2738/sameersbn-postgresql:12-20200524
+        ports:
+        - name: postgres
+          containerPort: 5432
+        env:
+        - name: DB_USER
+          value: gitlab
+        - name: DB_PASS
+          value: dongye@2738
+        - name: DB_NAME
+          value: gitlabhq_production
+        - name: DB_EXTENSION
+          value: 'pg_trgm,btree_gist'
+        resources: 
+          requests:
+            cpu: 1
+            memory: 1Gi
+          limits:
+            cpu: 1
+            memory: 1Gi
+        livenessProbe:
+          exec:
+            command: ["pg_isready","-h","localhost","-U","postgres"]
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command: ["pg_isready","-h","localhost","-U","postgres"]
+          initialDelaySeconds: 5
+          timeoutSeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 3
+        volumeMounts:
+        - name: postgresql-data
+          mountPath: /var/lib/postgresql
+      volumes:
+      - name: postgresql-data
+        persistentVolumeClaim:
+          claimName: gitlab-postgresql
+

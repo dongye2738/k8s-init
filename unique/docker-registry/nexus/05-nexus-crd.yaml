@@ -1,0 +1,95 @@
+# http-nexus
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nexus
+  namespace: public-service
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`nexus.dongye.com`)
+    kind: Rule
+    services:
+    - name: nexus
+      port: 8081
+    middlewares:  # 使用上面新建的中间件
+    - name: auto-https
+
+
+# https-nexus
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nexus-tls
+  namespace: public-service
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`nexus.dongye.com`)
+    kind: Rule
+    services:
+    - name: nexus
+      port: 8081
+  tls:
+    secretName: dongye-tls   # 注意namespaces
+
+# http-proxy
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: docker-proxy
+  namespace: public-service
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`docker.dongye.com`)
+    kind: Rule
+    services:
+    - name: docker-proxy
+      port: 80
+    middlewares:  # 使用上面新建的中间件
+    - name: auto-https
+
+
+# https-proxy
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: docker-proxy-tls
+  namespace: public-service
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`docker.dongye.com`)
+    kind: Rule
+    services:
+    - name: docker-proxy
+      port: 443
+  tls:
+    secretName: dongye-tls   # 注意namespaces
+
+# helm for nexus
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: helm
+  namespace: public-service
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: Host(`helm.dongye.com`)
+    kind: Rule
+    services:
+    - name: nexus
+      port: 8081
+
