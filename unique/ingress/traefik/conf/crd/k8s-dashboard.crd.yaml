@@ -1,13 +1,13 @@
 # 自动跳转中间件 注意namespaces
----
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: auto-https
-  namespace: kube-system
-spec:
-  redirectScheme:
-    scheme: https
+#---
+#apiVersion: traefik.containo.us/v1alpha1
+#kind: Middleware
+#metadata:
+#  name: auto-https
+#  namespace: kube-system
+#spec:
+#  redirectScheme:
+#    scheme: https
 
 
 # http-k8s-dashboard
@@ -28,6 +28,7 @@ spec:
       port: 80
     middlewares:  # 使用上面新建的中间件
     - name: auto-https
+      namespace: kube-system
 
 
 # https-k8s-dashboard
