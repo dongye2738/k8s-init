@@ -17,12 +17,6 @@ data:
     entryPoints:
       web:
         address: ":80"          ## 配置 80 端口，并设置入口名称为 web
-        #http:
-        #  redirections:         ## http自动跳转https,建议使用中间件控制
-        #    entrypoint:
-        #      to: ":443"
-        #      scheme: "https"
-        #      permanent: "true" # 永久重定向301
       websecure:
         address: ":443"         ## 配置 443 端口，并设置入口名称为 websecure
     providers:

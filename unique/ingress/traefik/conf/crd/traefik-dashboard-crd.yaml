@@ -14,7 +14,7 @@ spec:
   - match: Host(`traefik.dongye.com`)
     kind: Rule
     services:
-      - name: traefik
+      - name: traefik-ui
         port: 8080
 #    middlewares:  # 调用中间件开启强制跳转到 HTTPS
 #    - name: redirect-https
