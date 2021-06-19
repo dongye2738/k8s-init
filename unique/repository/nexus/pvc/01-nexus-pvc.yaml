@@ -4,7 +4,7 @@ metadata:
   name: nexus-nfs
   namespace: public-service
   annotations:
-    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage" #---需要与上面创建的storageclass的名称一致
+    volume.beta.kubernetes.io/storage-class: "nfs-storage" #---需要与上面创建的storageclass的名称一致
 spec:
   accessModes:
     - ReadWriteMany     #---该卷可以被许多节点读写安装

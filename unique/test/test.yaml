@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jenkins-agent
+  namespace: public-service
+  labels:
+    app: k8s-test
+spec:
+  #serviceAccountName: jenkins-admin
+  securityContext:                  #容器安全设置
+    runAsUser: 0                    #以ROOT用户运行容器
+  containers:
+  - name: jnlp
+    image: odavid/jenkins-jnlp-slave:4.6-1-30
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: ssh-key
+      mountPath: "/opt/ssh"
+    - name: jnlp-config
+      mountPath: "/etc/ssh"
+  volumes:
+  - name: ssh-key
+    secret:
+      secretName: jenkins-ssh
+      defaultMode: 0400
+      items:
+      - key: ssh-privatekey
+        path: id_rsa
+      - key: ssh-publickey
+        path: id_rsa.pub
+
+  - name: jnlp-config
+    configMap:
+      name: jnlp-config
+

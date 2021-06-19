@@ -6,7 +6,7 @@ metadata:
   name: jenkins
   namespace: public-service
   annotations:
-    volume.beta.kubernetes.io/storage-class: "managed-nfs-storage"
+    volume.beta.kubernetes.io/storage-class: "nfs-storage"
 spec:
   accessModes:
     - ReadWriteMany

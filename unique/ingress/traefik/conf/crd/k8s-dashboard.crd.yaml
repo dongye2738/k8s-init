@@ -21,7 +21,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`dashboard.dongye.com`)
+  - match: Host(`dashboard.dongye.live`)
     kind: Rule
     services:
     - name: kubernetes-dashboard
@@ -42,7 +42,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`dashboard.dongye.com`)
+  - match: Host(`dashboard.dongye.live`)
     kind: Rule
     services:
     - name: kubernetes-dashboard

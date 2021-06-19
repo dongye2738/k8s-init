@@ -1,3 +1,24 @@
 kubectl create secret docker-registry my-aliyun --docker-server=registry.cn-hangzhou.aliyuncs.com --docker-username=miosy1996@gmail.com --docker-password=xxx -n public-service
 
+# 查看
+kubectl get secret my-aliyun --output=yaml
 
+# .dockerconfigjson 字段的值是 Docker 凭据的 base64 表示,数据转换为可读格式为：
+kubectl get secret my-aliyun --output="jsonpath={.data.\.dockerconfigjson}" | base64 --decode
+
+
+# 要查看 auth 字段中的内容，将 base64 编码过的数据转换为可读格式：
+echo "..." | base64 --decode
+
+
+# 调用创建的docker凭据
+apiVersion: v1
+kind: Pod
+metadata:
+  name: name
+spec:
+  containers:
+  - name: name-container
+    image: <your-private-image>
+  imagePullSecrets:
+  - name: my-aliyun

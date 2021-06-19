@@ -113,6 +113,7 @@ spec:
         - name: REDIS_PORT
           value: '6379'
 
+        # k8s中有问题，未解决
         - name: GITLAB_HTTPS
           value: 'true'
 
@@ -126,27 +127,26 @@ spec:
           limits:
             cpu: 2
             memory: 4Gi
-
-        livenessProbe:
-          exec:
-            command:
-            - /usr/local/sbin/healthcheck
-          initialDelaySeconds: 300   # 容器启动后开始探测之前需要等多少秒
-          timeoutSeconds: 30    # 探测的超时时间
-          periodSeconds: 5  # 执行探测的频率
-          successThreshold: 1  # 探针失败后，最少连续成功多少次才视为成功
-          failureThreshold: 3  # 最少连续多少次失败才视为失败
-
-        readinessProbe:
-          exec:
-            command:
-            - /usr/local/sbin/healthcheck
-          initialDelaySeconds: 300   # 容器启动后开始探测之前需要等多少秒
-          timeoutSeconds: 30    # 探测的超时时间
-          periodSeconds: 5  # 执行探测的频率
-          successThreshold: 1  # 探针失败后，最少连续成功多少次才视为成功
-          failureThreshold: 3  # 最少连续多少次失败才视为失败
-
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: http
+#            scheme: HTTP
+#          initialDelaySeconds: 300
+#          timeoutSeconds: 5
+#          periodSeconds: 10
+#          successThreshold: 1
+#          failureThreshold: 3
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: http
+#            scheme: HTTP
+#          initialDelaySeconds: 5
+#          timeoutSeconds: 30
+#          periodSeconds: 10
+#          successThreshold: 1
+#          failureThreshold: 3
         volumeMounts:
         - name: gitlab
           mountPath: /home/git/data

@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`prometheus.dongye.com`)
+  - match: Host(`prometheus.dongye.live`)
     kind: Rule
     services:
     - name: prometheus
@@ -29,7 +29,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`prometheus.dongye.com`)
+  - match: Host(`prometheus.dongye.live`)
     kind: Rule
     services:
     - name: prometheus

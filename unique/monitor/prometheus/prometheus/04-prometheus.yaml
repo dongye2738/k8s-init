@@ -18,7 +18,7 @@ spec:
       serviceAccountName: prometheus
       containers:
       - name: prometheus  # Prometheus 容器是主容器，用于运行 Prometheus 进程
-        image: prom/prometheus:v2.26.0
+        image: prom/prometheus:v2.27.1
         ports:
         - name: web
           containerPort: 9090
@@ -36,7 +36,7 @@ spec:
         - "--web.console.templates=/etc/prometheus/consoles"  # 指定控制台模板的存储路径
         resources:
           limits:
-            cpu: 1000m
+            cpu: 2000m
             memory: 1024Mi
           requests:
             cpu: 1000m

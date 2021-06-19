@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: jenkins-slave
+spec:
+  serviceAccountName: jenkins-admin
+  securityContext:                  #容器安全设置
+    runAsUser: 0                    #以jenkins用户运行容器
+    #privileged: true                #赋予特权执行容器
+  hostAliases:    # 向 hosts 文件添加额外的条目
+  - ip: "192.168.0.4"
+    hostnames:
+    - "docker.dongye.live"
+    - "nexus.dongye.live"
+    #- "gitlab.dongye.live"
+  containers:
+  - name: jnlp                      #Jenkins Slave镜像
+    image: registry.cn-hangzhou.aliyuncs.com/dongye2738/jenkins-jnlp:1.0
+    #设置工作目录
+    workingDir: /home/jenkins/agent
+    tty: true
+    # volumeMounts:
+    # - name: ssh-key
+    #   readOnly: true
+    #   mountPath: "/home/jenkins/ssh"
+    # - name: jnlp-config
+    #   mountPath: "/etc/ssh"
+    # command:
+    # - chown
+    # - "-R"
+    # - "/home/jenkins/ssh"
+  - name: docker                    #Docker镜像
+    image: docker:20.10.6-dind
+    command: ['cat']
+    tty: true
+    volumeMounts:
+    - name: docker
+      mountPath: /usr/bin/docker
+    - name: dongye-crt
+      readOnly: true
+      mountPath: "/etc/docker/certs.d/"
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+    - name: docker-config
+      mountPath: /etc/docker
+  - name: maven                     #Maven镜像
+    image: maven:3.6.3-ibmjava-8-alpine
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: maven-m2
+      mountPath: /root/.m2
+  - name: helm-kubectl              #Kubectl & Helm镜像
+    image: dtzar/helm-kubectl:3.6.0
+    command:
+    - cat
+    tty: true
+  imagePullSecrets:
+  - name: my-aliyun
+  volumes:
+  - name: docker                    #将宿主机 Docker 文件夹挂进容器，方便存储&拉取本地镜像
+    hostPath: 
+      path: /usr/bin/docker
+  - name: docker-sock               #将宿主机 Docker.sock 挂进容器
+    hostPath: 
+      path: /var/run/docker.sock
+  - name: docker-config             #将宿主机 Docker 配置挂在进入容器
+    hostPath: 
+      path: /etc/docker
+  - name: maven-m2                  #Maven 本地仓库挂在到 NFS 共享存储，方便不同节点能同时访问与存储
+    persistentVolumeClaim: 
+      claimName: maven
+  - name: dongye-crt
+    secret:
+      secretName: dongye-tls
+      items:
+      - key: tls.crt
+        path: ca.crt
+  # - name: ssh-key
+  #   secret: 
+  #     secretName: jenkins-ssh
+  #     defaultMode: 0400
+  #     items:
+  #     - key: ssh-privatekey
+  #       path: id_rsa
+  #     - key: ssh-publickey
+  #       path: id_rsa.pub
+  # - name: jnlp-config
+  #   configMap:
+  #     name: jnlp-config
+#  nodeSelector:
+#    kubernetes.io/hostname: node-2-12

@@ -1,50 +1,38 @@
-apiVersion: traefik.containo.us/v1alpha1
-kind: Middleware
-metadata:
-  name: nacos-rewrite-addr
-  namespace: public-service
-spec:
-  replacePathRegex:
-    regex: /(.*)
-    replacement: /nacos/$1
-
-# http-nacos
+# http-jenkins
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nacos
+  name: jenkins
   namespace: public-service
 spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`nacos.dongye.com`)
+  - match: Host(`jenkins.dongye.live`)
     kind: Rule
     services:
-    - name: nacos
-      port: 8848
+    - name: jenkins
+      port: 8080
     middlewares:  # 使用上面新建的中间件
     - name: auto-https
 
 
-# https-nacos
+# https-jenkins
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: nacos-tls
+  name: jenkins-tls
   namespace: public-service
 spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`nacos.dongye.com`)
+  - match: Host(`jenkins.dongye.live`)
     kind: Rule
     services:
-    - name: nacos
-      port: 8848
-#    middlewares: 
-#    - name: nacos-rewrite-addr
+    - name: jenkins
+      port: 8080
   tls:
     secretName: dongye-tls   # 注意namespaces

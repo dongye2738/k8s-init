@@ -47,18 +47,18 @@ spec:
         - name: DB_USER
           value: gitlab
         - name: DB_PASS
-          value: dongye@2738
+          value: dongye2738
         - name: DB_NAME
           value: gitlabhq_production
         - name: DB_EXTENSION
           value: 'pg_trgm,btree_gist'
         resources: 
           requests:
-            cpu: 1
-            memory: 1Gi
+            cpu: 2
+            memory: 2Gi
           limits:
-            cpu: 1
-            memory: 1Gi
+            cpu: 2
+            memory: 2Gi
         livenessProbe:
           exec:
             command: ["pg_isready","-h","localhost","-U","postgres"]
@@ -78,6 +78,8 @@ spec:
         volumeMounts:
         - name: postgresql-data
           mountPath: /var/lib/postgresql
+      imagePullSecrets:
+      - name: my-aliyun
       volumes:
       - name: postgresql-data
         persistentVolumeClaim:

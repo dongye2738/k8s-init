@@ -1,0 +1,65 @@
+# 自动跳转
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: public-service
+spec:
+  redirectScheme:
+    scheme: https
+
+# 路径重写
+---
+#apiVersion: traefik.containo.us/v1alpha1
+#kind: Middleware
+#metadata:
+#  name: nacos-rewrite-addr
+#  namespace: public-service
+#spec:
+#  replacePathRegex:
+#    regex: /(.*)
+#    replacement: /nacos/$1
+
+# http-nacos
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nacos
+  namespace: public-service
+spec:
+  entryPoints:
+    - web
+  routes:
+  #- match: Host(`nacos.dongye.live`)
+  - match: Host(`nacos.dongye.live`) && PathPrefix(`/nacos`)
+    kind: Rule
+    services:
+    - name: nacos
+      port: 8848
+    middlewares:  # 使用自动跳转的中间件
+    - name: auto-https
+
+
+# https-nacos
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nacos-tls
+  namespace: public-service
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  #- match: Host(`nacos.dongye.live`)
+  - match: Host(`nacos.dongye.live`) && PathPrefix(`/nacos`)
+    kind: Rule
+    services:
+    - name: nacos
+      port: 8848
+#    middlewares: 
+#    - name: nacos-rewrite-addr
+  tls:
+    secretName: dongye-tls   # 注意namespaces

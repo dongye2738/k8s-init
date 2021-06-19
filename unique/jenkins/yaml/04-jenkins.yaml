@@ -20,7 +20,7 @@ spec:
       serviceAccountName: jenkins-admin
       containers:
       - name: jenkins
-        image: jenkins/jenkins:2.263.4-lts-centos7
+        image: jenkins/jenkins:2.277.4-lts-centos7
         securityContext:                     
           runAsUser: 0                      #设置以ROOT用户运行容器
           privileged: true                  #拥有特权
@@ -31,10 +31,10 @@ spec:
           containerPort: 50000
         resources:
           limits:
-            memory: 2Gi
+            memory: 4Gi
             cpu: "1000m"
           requests:
-            memory: 1Gi
+            memory: 2Gi
             cpu: "500m"
         env:
         - name: LIMITS_MEMORY

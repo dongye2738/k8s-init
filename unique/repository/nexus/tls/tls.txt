@@ -1,0 +1,5 @@
+# 创建自签名证书
+$ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=dongye.com"
+
+# 将证书存储到 Kubernetes Secret 中
+$ kubectl create secret tls dongye-tls --key=tls.key --cert=tls.crt

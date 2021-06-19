@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: public-service
+  labels:
+    app: k8s-test
+spec:
+  # serviceAccountName: jenkins-admin
+  # securityContext:                  #容器安全设置
+  #   runAsUser: 0                    #以ROOT用户运行容器
+  #   privileged: true                #赋予特权执行容器
+  #hostAliases:    # 向 hosts 文件添加额外的条目
+  #- ip: "192.168.0.4"
+    #hostnames:
+    #- "docker.dongye.live"
+    #- "nexus.dongye.live"
+    #- "gitlab.dongye.live"
+  containers:
+  - name: busybox                     
+    image: busybox:stable
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: ssh-key
+      readOnly: true
+      mountPath: "/root/.ssh"
+  volumes:
+  # - name: docker                    #将宿主机 Docker 文件夹挂进容器，方便存储&拉取本地镜像
+  #   hostPath: 
+  #     path: /usr/bin/docker
+  # - name: maven-m2                  #Maven 本地仓库挂在到 NFS 共享存储，方便不同节点能同时访问与存储
+  #   persistentVolumeClaim: 
+  #     claimName: maven
+  - name: ssh-key
+    secret: 
+      secretName: jenkins-ssh
+      items:
+      - key: ssh-privatekey
+        path: id_rsa
+      - key: ssh-publickey
+        path: id_rsa.pub
+#  nodeSelector:
+#    kubernetes.io/hostname: node-2-12

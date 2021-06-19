@@ -11,7 +11,7 @@ spec:
 #    secretName: dongye-tls  # 需将证书放到k8s secret中
   routes:
 #  - match: Host(`traefik.dongye.com`) && PathPrefix(`/api`)
-  - match: Host(`traefik.dongye.com`)
+  - match: Host(`traefik.dongye.live`)
     kind: Rule
     services:
       - name: traefik-ui

@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`nexus.dongye.com`)
+  - match: Host(`nexus.dongye.live`)
     kind: Rule
     services:
     - name: nexus
@@ -29,7 +29,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`nexus.dongye.com`)
+  - match: Host(`nexus.dongye.live`)
     kind: Rule
     services:
     - name: nexus
@@ -48,7 +48,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`docker.dongye.com`)
+  - match: Host(`docker.dongye.live`)
     kind: Rule
     services:
     - name: docker-proxy
@@ -68,7 +68,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`docker.dongye.com`)
+  - match: Host(`docker.dongye.live`)
     kind: Rule
     services:
     - name: docker-proxy
@@ -87,7 +87,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`helm.dongye.com`)
+  - match: Host(`helm.dongye.live`)
     kind: Rule
     services:
     - name: nexus

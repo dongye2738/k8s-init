@@ -9,7 +9,7 @@ spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`grafana.dongye.com`)
+  - match: Host(`grafana.dongye.live`)
     kind: Rule
     services:
     - name: grafana
@@ -29,7 +29,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`grafana.dongye.com`)
+  - match: Host(`grafana.dongye.live`)
     kind: Rule
     services:
     - name: grafana

@@ -15,27 +15,63 @@ spec:
       labels:
         app: grafana
     spec:
-      containers:
-      - name: grafana
-        image: grafana/grafana:7.5.4-ubuntu
-        ports:
-        - name: web
-          containerPort: 3000
+      initContainers:             ## 初始化容器，用于修改挂载的存储的文件夹归属组与归属用户
+      - name: init-file
+        image: busybox:1.28
+        imagePullPolicy: IfNotPresent
         securityContext:
-          runAsUser: 472
-          privileged: true
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 1024Mi
-          requests:
-            cpu: 500m
-            memory: 512Mi
+          runAsUser: 0
+        command: ['chown', '-R', "472:0", "/var/lib/grafana"]
         volumeMounts:
         - name: data
           mountPath: /var/lib/grafana
           subPath: grafana
-      volumes:
+      containers:                
+      - name: grafana             ## Grafana 容器
+        image: grafana/grafana:7.5.7
+        securityContext:          ## 容器安全策略，设置运行容器使用的归属组与用户
+          runAsGroup: 0
+          runAsUser: 472
+        ports:
+        - name: web
+          containerPort: 3000
+        env:                      ## 配置环境变量，设置 Grafana 的默认管理员用户名/密码
+        - name: GF_SECURITY_ADMIN_USER
+          value: "admin"
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: "v9KSLfJFOdeF"
+        readinessProbe:           ## 就绪探针
+          failureThreshold: 10
+          httpGet:
+            path: /api/health
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 30
+        livenessProbe:            ## 存活探针
+          failureThreshold: 10
+          httpGet:
+            path: /api/health
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:          # 资源限制
+          limits:
+            cpu: 2000m
+            memory: 1024Mi
+          requests:
+            cpu: 1000m
+            memory: 512Mi        
+        volumeMounts:            ## 容器挂载配置
+        - name: data
+          mountPath: /var/lib/grafana
+          subPath: grafana
+      volumes:                   ## 共享存储挂载配置
       - name: data
         persistentVolumeClaim:
-          claimName: grafana-nfs
+          claimName: grafana-nfs     ## 指定使用的 PVC

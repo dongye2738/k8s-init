@@ -1,38 +1,39 @@
-# http-jenkins
+# http-gitlab
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: jenkins
+  name: gitlab
   namespace: public-service
 spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`jenkins.dongye.com`)
+  - match: Host(`gitlab.dongye.live`)
     kind: Rule
     services:
-    - name: jenkins
-      port: 8080
+    - name: gitlab
+      port: 80
     middlewares:  # 使用上面新建的中间件
     - name: auto-https
 
 
-# https-jenkins
+# https-gitlab
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: jenkins-tls
+  name: gitlab-tls
   namespace: public-service
 spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host(`jenkins.dongye.com`)
+  - match: Host(`gitlab.dongye.live`)
     kind: Rule
     services:
-    - name: jenkins
-      port: 8080
+    - name: gitlab
+      port: 80
   tls:
     secretName: dongye-tls   # 注意namespaces
+
